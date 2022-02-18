@@ -17,19 +17,22 @@ namespace EmpleadosMVC.Controllers
         // GET: Empleados
         public ActionResult Index(string EmpleadoCategoria, string BuscarNombre, string MenorMayor, string BuscarAntiguedad, string BuscarEdad)
         {
-            var antiguedad=0;
-            try 
-            {
-                antiguedad = Convert.ToInt32(BuscarAntiguedad);
-            }
-            catch 
-            {
-            }
+           
             var ListaCategoria = new List<string>();
             var ConsultaCategoria = from gq in db.Empleados orderby gq.Categoria select gq.Categoria; ListaCategoria.AddRange(ConsultaCategoria.Distinct());
             ViewBag.EmpleadoCategoria = new SelectList(ListaCategoria);
             ViewBag.MenorMayor = new SelectList(new List<string> { "Menor que", "Mayor que" });
             var Empleados = from cr in db.Empleados select cr;
+
+            var antiguedad = 0;
+            try
+            {
+                antiguedad = Convert.ToInt32(BuscarAntiguedad);
+            }
+            catch
+            {
+                return View(Empleados);
+            }
 
             //Name filter
             if (!String.IsNullOrEmpty(BuscarNombre))

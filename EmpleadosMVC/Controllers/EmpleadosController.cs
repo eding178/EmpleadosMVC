@@ -26,9 +26,11 @@ namespace EmpleadosMVC.Controllers
             {
             }
             var ListaCategoria = new List<string>();
-            var ConsultaCategoria = from gq in db.Empleados orderby gq.Categoria select gq.Categoria; ListaCategoria.AddRange(ConsultaCategoria.Distinct());
+            var ConsultaCategoria = from gq in db.Empleados orderby gq.Categoria select gq.Categoria;
+            ListaCategoria.AddRange(ConsultaCategoria.Distinct());
             ViewBag.EmpleadoCategoria = new SelectList(ListaCategoria);
             ViewBag.MenorMayor = new SelectList(new List<string> { "Menor que", "Mayor que" });
+            //ViewBag.OrderBy = new SelectList(new List<string> {db.Empleados.});
             var Empleados = from cr in db.Empleados select cr;
 
             //Name filter

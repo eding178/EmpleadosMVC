@@ -9,13 +9,34 @@ using System.Web.Mvc;
 using EmpleadosMVC.Models;
 
 namespace EmpleadosMVC.Controllers
-{
+{   
+    public enum ECol 
+    {
+        Default,
+        Nombre,
+        Antiguedad,
+        Edad,
+        Categoria
+    }
+    public enum ESize 
+    {
+        Default,
+        Menor,
+        Mayor
+    }
+
     public class EmpleadosController : Controller
     {
-        private EmpleadoDBContext db = new EmpleadoDBContext();
 
+        private EmpleadoDBContext db = new EmpleadoDBContext();
         // GET: Empleados
-        public ActionResult Index(string EmpleadoCategoria, string BuscarNombre, string MenorMayor, string BuscarAntiguedad, string BuscarEdad)
+        public ActionResult Index(
+            string EmpleadoCategoria, 
+            string BuscarNombre,
+            string BuscarAntiguedad, 
+            string BuscarEdad,
+            ESize MenorMayor = 0,
+            ECol OrderBy =0)
         {
             var antiguedad=0;
             try 
@@ -23,36 +44,64 @@ namespace EmpleadosMVC.Controllers
                 antiguedad = Convert.ToInt32(BuscarAntiguedad);
             }
             catch 
-            {
-            }
+            { }
+
             var ListaCategoria = new List<string>();
             var ConsultaCategoria = from gq in db.Empleados orderby gq.Categoria select gq.Categoria;
             ListaCategoria.AddRange(ConsultaCategoria.Distinct());
+
             ViewBag.EmpleadoCategoria = new SelectList(ListaCategoria);
-            ViewBag.MenorMayor = new SelectList(new List<string> { "Menor que", "Mayor que" });
-            //ViewBag.OrderBy = new SelectList(new List<string> {db.Empleados.});
+            ViewBag.MenorMayor = new SelectList(new List<string> { ESize.Menor.ToString(), ESize.Mayor.ToString() });
+            ViewBag.OrderBy = new SelectList(new List<string> 
+            { 
+                ECol.Nombre.ToString(),
+                ECol.Antiguedad.ToString(), 
+                ECol.Edad.ToString(),
+                ECol.Categoria.ToString()
+            });
+
+           
             var Empleados = from cr in db.Empleados select cr;
 
             //Name filter
             if (!String.IsNullOrEmpty(BuscarNombre))
             {
-                Empleados = Empleados.Where(c => c.Nombre.Contains(BuscarNombre));
+                Empleados = Empleados.Where(e => e.Nombre.Contains(BuscarNombre));
             }
             //Category filter
             if (!string.IsNullOrEmpty(EmpleadoCategoria))
             {
-                Empleados = Empleados.Where(g => g.Categoria == EmpleadoCategoria);
+                Empleados = Empleados.Where(e => e.Categoria == EmpleadoCategoria);
             }
             //Antiguedad filter
 
-            if (MenorMayor != "")
             switch (MenorMayor)
             {
-                case "Menor que":
+                case ESize.Default:
+                    break;
+                case ESize.Menor:
                         Empleados = Empleados.Where(e => e.Antiguedad < antiguedad);
                     break;
-                case "Mayor que":
+                case ESize.Mayor:
                         Empleados = Empleados.Where(e => e.Antiguedad > antiguedad);
+                    break;
+            }
+            //OrderBy
+            switch (OrderBy)
+            {
+                case ECol.Default:
+                    break;
+                case ECol.Nombre:
+                    Empleados = Empleados.OrderBy(e => e.Nombre);
+                    break;
+                case ECol.Antiguedad:
+                    Empleados = Empleados.OrderBy(e => e.Antiguedad);
+                    break;
+                case ECol.Edad:
+                    Empleados = Empleados.OrderBy(e => e.Edad);
+                    break;
+                case ECol.Categoria:
+                    Empleados = Empleados.OrderBy(e => e.Categoria);
                     break;
             }
 

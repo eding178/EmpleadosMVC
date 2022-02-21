@@ -33,7 +33,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Edad, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Edad, new { htmlAttributes = new { @class = "form-control" }})
+                @Html.EditorFor(model => model.Edad, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.Edad, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -41,7 +41,8 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Categoria, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Categoria, new { htmlAttributes = new { @class = "form-control" } })
+
+                @Html.EditorFor(model => model.Categoria, new { htmlAttributes = new { @class = "form-control" }, maxlength = "20"})
                 @Html.ValidationMessageFor(model => model.Categoria, "", new { @class = "text-danger" })
             </div>
         </div>

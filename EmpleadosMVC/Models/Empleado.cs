@@ -32,6 +32,7 @@ namespace EmpleadosMVC.Models
             */
         }
         [Required]
+        [StringLength(5, MinimumLength = 0)]
         public string Categoria { get; set; }
 
         /*[Compare("", ErrorMessage = "La Edad no es coherente con la antiguedad.")]

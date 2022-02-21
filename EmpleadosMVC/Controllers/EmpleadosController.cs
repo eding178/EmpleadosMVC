@@ -27,8 +27,8 @@ namespace EmpleadosMVC.Controllers
 
     public class EmpleadosController : Controller
     {
-
         private EmpleadoDBContext db = new EmpleadoDBContext();
+
         // GET: Empleados
         public ActionResult Index(
             string EmpleadoCategoria, 
@@ -63,28 +63,25 @@ namespace EmpleadosMVC.Controllers
            
             var Empleados = from cr in db.Empleados select cr;
 
-            var antiguedad = 0;
-            try
+            //Edad filter
+            if (!string.IsNullOrEmpty(BuscarEdad))
             {
-                antiguedad = Convert.ToInt32(BuscarAntiguedad);
-            }
-            catch
-            {
-                return View(Empleados);
+                Empleados = Empleados.Where(e => e.Edad.Equals(BuscarEdad));
             }
 
-            //Name filter
-            if (!String.IsNullOrEmpty(BuscarNombre))
+            //Nombre filter
+            if (!string.IsNullOrEmpty(BuscarNombre))
             {
                 Empleados = Empleados.Where(e => e.Nombre.Contains(BuscarNombre));
             }
-            //Category filter
+
+            //Categoria filter
             if (!string.IsNullOrEmpty(EmpleadoCategoria))
             {
                 Empleados = Empleados.Where(e => e.Categoria == EmpleadoCategoria);
             }
-            //Antiguedad filter
 
+            //Antiguedad filter
             switch (MenorMayor)
             {
                 case ESize.Default:
@@ -96,6 +93,7 @@ namespace EmpleadosMVC.Controllers
                         Empleados = Empleados.Where(e => e.Antiguedad > antiguedad);
                     break;
             }
+
             //OrderBy
             switch (OrderBy)
             {

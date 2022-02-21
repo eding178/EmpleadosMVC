@@ -3,7 +3,9 @@
 @{
     ViewBag.Title = "Index";
 }
-
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
 <h2>Index</h2>
 <p>
 
@@ -30,7 +32,7 @@
         </tr>
 
         <tr>
-            <th>
+            <th id="orderBy">
                 OrderBy:@Html.DropDownList("OrderBy", "")
             </th>
         </tr>

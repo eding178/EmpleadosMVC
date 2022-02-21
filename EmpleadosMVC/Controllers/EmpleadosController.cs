@@ -7,23 +7,11 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using EmpleadosMVC.Models;
+using EmpleadosMVC.Enums;
 
 namespace EmpleadosMVC.Controllers
 {   
-    public enum ECol 
-    {
-        Default,
-        Nombre,
-        Antiguedad,
-        Edad,
-        Categoria
-    }
-    public enum ESize 
-    {
-        Default,
-        Menor,
-        Mayor
-    }
+
 
     public class EmpleadosController : Controller
     {

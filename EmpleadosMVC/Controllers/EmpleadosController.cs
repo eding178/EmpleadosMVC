@@ -63,6 +63,16 @@ namespace EmpleadosMVC.Controllers
            
             var Empleados = from cr in db.Empleados select cr;
 
+            var antiguedad = 0;
+            try
+            {
+                antiguedad = Convert.ToInt32(BuscarAntiguedad);
+            }
+            catch
+            {
+                return View(Empleados);
+            }
+
             //Name filter
             if (!String.IsNullOrEmpty(BuscarNombre))
             {

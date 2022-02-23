@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using EmpleadosMVC.Models;
 using EmpleadosMVC.Enums;
+using Microsoft.AspNetCore.Cors;
 
 namespace EmpleadosMVC.Controllers
 {   
@@ -35,7 +36,7 @@ namespace EmpleadosMVC.Controllers
             { }
 
             var ListaCategoria = new List<string>();
-            var ConsultaCategoria = from gq in db.Empleados orderby gq.Categoria select gq.Categoria;
+            var ConsultaCategoria = from e in db.Empleados orderby e.Categoria select e.Categoria;
             ListaCategoria.AddRange(ConsultaCategoria.Distinct());
 
             ViewBag.EmpleadoCategoria = new SelectList(ListaCategoria);
@@ -49,7 +50,7 @@ namespace EmpleadosMVC.Controllers
             });
 
            
-            var Empleados = from cr in db.Empleados select cr;
+            var Empleados = from e in db.Empleados select e;
 
             //Edad filter
             if (!string.IsNullOrEmpty(BuscarEdad))
@@ -121,9 +122,30 @@ namespace EmpleadosMVC.Controllers
             return View(empleado);
         }
 
-        // GET: Empleados/Create
+        // GET: Empleados/DetailsAPI/5
+        [EnableCors("origins: *, headers: *, methods: *")]
+        public string DetailsAPI(int? id)
+        {
+            if (id == null)
+            {
+                //return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Empleado empleado = db.Empleados.Find(id);
+            if (empleado == null)
+            {
+                //return HttpNotFound();
+            }
+            string empleadoJSON = empleadoToJson(empleado);
+            return "Method("+empleadoJSON+")";
+        }
 
-        
+        private string empleadoToJson(Empleado e) 
+        {
+            return "{\"empleado\": {\"Id\": \"" + e.ID + "\",\"Nombre\": \"" + e.Nombre + "\",\"Edad\": \"" + e.Edad + "\",\"Antiguedad\": \"" + e.Antiguedad + "\",\"Categoria\": \"" + e.Categoria + "\"}}";
+        }
+
+
+        // GET: Empleados/Create
         public ActionResult Create()
         {
             return View();

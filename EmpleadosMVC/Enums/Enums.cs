@@ -5,9 +5,7 @@ using System.Web;
 
 namespace EmpleadosMVC.Enums
 {
-    public class Enums
-    {  }
-
+   
     public enum ECol
     {
         Default,

@@ -32,8 +32,7 @@ namespace EmpleadosMVC.Controllers
             {
                 antiguedad = Convert.ToInt32(BuscarAntiguedad);
             }
-            catch 
-            { }
+            catch { }
 
             var ListaCategoria = new List<string>();
             var ConsultaCategoria = from e in db.Empleados orderby e.Categoria select e.Categoria;
@@ -48,7 +47,6 @@ namespace EmpleadosMVC.Controllers
                 ECol.Edad.ToString(),
                 ECol.Categoria.ToString()
             });
-
            
             var Empleados = from e in db.Empleados select e;
 
@@ -105,8 +103,6 @@ namespace EmpleadosMVC.Controllers
             return View(Empleados);
         }
 
-
-
         // GET: Empleados/Details/5
         public ActionResult Details(int? id)
         {
@@ -122,7 +118,17 @@ namespace EmpleadosMVC.Controllers
             return View(empleado);
         }
 
-        // GET: Empleados/DetailsAPI/5
+        //API
+        // GET:ENDPOINT Empleados/allAPI
+        [EnableCors("origins: *, headers: *, methods: *")]
+        public string allAPI()
+        {
+            IList<Empleado> empleados = db.Empleados.ToList();
+            return "Method(" + empleadoToJson(empleados) + ")";
+        }
+
+        //API
+        // GET:ENDPOINT Empleados/DetailsAPI/5
         [EnableCors("origins: *, headers: *, methods: *")]
         public string DetailsAPI(int? id)
         {
@@ -135,15 +141,8 @@ namespace EmpleadosMVC.Controllers
             {
                 //return HttpNotFound();
             }
-            string empleadoJSON = empleadoToJson(empleado);
-            return "Method("+empleadoJSON+")";
+            return "Method("+ empleadoToJson(empleado) + ")";
         }
-
-        private string empleadoToJson(Empleado e) 
-        {
-            return "{\"empleado\": {\"Id\": \"" + e.ID + "\",\"Nombre\": \"" + e.Nombre + "\",\"Edad\": \"" + e.Edad + "\",\"Antiguedad\": \"" + e.Antiguedad + "\",\"Categoria\": \"" + e.Categoria + "\"}}";
-        }
-
 
         // GET: Empleados/Create
         public ActionResult Create()
@@ -271,6 +270,32 @@ namespace EmpleadosMVC.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        //
+        //JSON CONVERSORS
+        //
+        private string empleadoToJson(IList<Empleado> elist)
+        {
+            int totalEmpleados = db.Empleados.Count();
+
+            string empleadoListJSON = "{\"empleado\": [";
+
+            foreach (Empleado e in elist)
+            {
+                totalEmpleados -= 1;
+                empleadoListJSON += "{\"Id\": \"" + e.ID + "\",\"Nombre\": \"" + e.Nombre + "\",\"Edad\": \"" + e.Edad + "\",\"Antiguedad\": \"" + e.Antiguedad + "\",\"Categoria\": \"" + e.Categoria + "\"}";
+                if (totalEmpleados > 0)
+                    empleadoListJSON += ",";
+            }
+
+            empleadoListJSON += "]}";
+
+            return empleadoListJSON;
+        }
+        private string empleadoToJson(Empleado e)
+        {
+            return "{\"empleado\": {\"Id\": \"" + e.ID + "\",\"Nombre\": \"" + e.Nombre + "\",\"Edad\": \"" + e.Edad + "\",\"Antiguedad\": \"" + e.Antiguedad + "\",\"Categoria\": \"" + e.Categoria + "\"}}";
         }
     }
 }

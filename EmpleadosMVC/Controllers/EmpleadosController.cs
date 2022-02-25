@@ -12,8 +12,6 @@ using Microsoft.AspNetCore.Cors;
 
 namespace EmpleadosMVC.Controllers
 {   
-
-
     public class EmpleadosController : Controller
     {
         private EmpleadoDBContext db = new EmpleadoDBContext();
@@ -50,7 +48,6 @@ namespace EmpleadosMVC.Controllers
            
             var Empleados = from e in db.Empleados select e;
             Empleados = filtrar(Empleados, BuscarNombre, BuscarEdad, antiguedad, BuscarCategoria, MenorMayor, OrderBy);
-            
 
             return View(Empleados);
         }
@@ -100,21 +97,24 @@ namespace EmpleadosMVC.Controllers
         [EnableCors("origins: *, headers: *, methods: *")]
         public void EditAPI( Empleado empleado)
         {
-            empleado = llenarCamposNull(empleado);
-
-            if (validacionLogicaEdadAntiguedad(empleado.Edad, empleado.Antiguedad))
+            if (empleado.ID != 0)
             {
-                var query = (from a in db.Empleados
-                             where a.ID == empleado.ID
-                             select a).FirstOrDefault();
+                empleado = llenarCamposNull(empleado);
 
-                query.Nombre = empleado.Nombre;
-                query.Edad = empleado.Edad;
-                query.Antiguedad = empleado.Antiguedad;
-                query.Categoria = empleado.Categoria;
+                if (validacionLogicaEdadAntiguedad(empleado.Edad, empleado.Antiguedad))
+                {
+                    var query = (from a in db.Empleados
+                                 where a.ID == empleado.ID
+                                 select a).FirstOrDefault();
 
-                db.SaveChanges();
-            } 
+                    query.Nombre = empleado.Nombre;
+                    query.Edad = empleado.Edad;
+                    query.Antiguedad = empleado.Antiguedad;
+                    query.Categoria = empleado.Categoria;
+
+                    db.SaveChanges();
+                }
+            }
         }
 
         // GET: Empleados/Create
@@ -127,6 +127,7 @@ namespace EmpleadosMVC.Controllers
         {
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult CreateError([Bind(Include = "ID,Nombre,Antiguedad,Edad,Categoria")] Empleado empleado)
@@ -170,9 +171,8 @@ namespace EmpleadosMVC.Controllers
 
             db.Empleados.Add(empleado);
             db.SaveChanges();
+
             return RedirectToAction("Index");
-
-
         }
 
         // GET: Empleados/Edit/5
@@ -238,9 +238,8 @@ namespace EmpleadosMVC.Controllers
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-            {
                 db.Dispose();
-            }
+            
             base.Dispose(disposing);
         }
 

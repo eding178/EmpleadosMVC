@@ -18,27 +18,10 @@ namespace EmpleadosMVC.Models
         [Required]
         [Range(18, 65)]
         public int Edad
-        {
-            get; set;
-            
-            /*get
-            {
-                return this.Edad;
-            }
-            set
-            {
-                if (logictest(this.Edad, Antiguedad)) { this.Edad = value; }
-            }
-            */
-        }
+        { get; set; }
+
         [Required]
         public string Categoria { get; set; }
-
-        /*[Compare("", ErrorMessage = "La Edad no es coherente con la antiguedad.")]
-        private bool logictest(int Edad, int Antiguedad)
-        {
-            return Edad - 18 <= Antiguedad;
-        }*/
     }
 
     public class EmpleadoDBContext : DbContext

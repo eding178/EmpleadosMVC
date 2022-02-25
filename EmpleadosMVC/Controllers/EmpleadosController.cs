@@ -132,16 +132,56 @@ namespace EmpleadosMVC.Controllers
         [EnableCors("origins: *, headers: *, methods: *")]
         public string DetailsAPI(int? id)
         {
-            if (id == null)
+            if (id != null)
             {
-                //return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                Empleado empleado = db.Empleados.Find(id);
+                if(empleado != null)
+                    return "Method(" + empleadoToJson(empleado) + ")";
             }
-            Empleado empleado = db.Empleados.Find(id);
-            if (empleado == null)
+            return "Method({ })";
+        }
+        private Empleado llenarCamposNull(Empleado empleado) 
+        {
+            var empleadoResult = db.Empleados.Where(e => e.ID.Equals(empleado.ID));
+
+            if (empleado.Nombre == null)            
+                empleado.Nombre = empleadoResult.First().Nombre;
+
+            if (empleado.Categoria == null)
+                empleado.Categoria = empleadoResult.First().Categoria;
+
+            if (empleado.Edad == 0)
+                empleado.Edad = empleadoResult.First().Edad;
+
+            if (empleado.Antiguedad == 0)
+                empleado.Antiguedad = empleadoResult.First().Antiguedad;
+
+            return empleado;
+
+        }
+        //API
+        // GET:ENDPOINT Empleados/EditAPI/5
+        //[ValidateAntiForgeryToken]
+        [HttpGet]//post o put me dan error de CORS
+        [EnableCors("origins: *, headers: *, methods: *")]
+        public void EditAPI( Empleado empleado)
+        {
+            empleado = llenarCamposNull(empleado);
+
+            if (validacionLogicaEdadAntiguedad(empleado.Edad, empleado.Antiguedad))
             {
-                //return HttpNotFound();
-            }
-            return "Method("+ empleadoToJson(empleado) + ")";
+                var query = (from a in db.Empleados
+                             where a.ID == empleado.ID
+                             select a).FirstOrDefault();
+
+                query.Nombre = empleado.Nombre;
+                query.Edad = empleado.Edad;
+                query.Antiguedad = empleado.Antiguedad;
+                query.Categoria = empleado.Categoria;
+
+                db.SaveChanges();
+                
+            } 
         }
 
         // GET: Empleados/Create
@@ -229,9 +269,9 @@ namespace EmpleadosMVC.Controllers
             {
                 if(validacionLogicaEdadAntiguedad(empleado.Edad, empleado.Antiguedad)) 
                 { 
-                db.Entry(empleado).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                    db.Entry(empleado).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
                 }
             }
             return View(empleado);

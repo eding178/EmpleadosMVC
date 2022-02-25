@@ -20,7 +20,7 @@ namespace EmpleadosMVC.Controllers
 
         // GET: Empleados
         public ActionResult Index(
-            string EmpleadoCategoria, 
+            string BuscarCategoria, 
             string BuscarNombre,
             string BuscarAntiguedad, 
             string BuscarEdad,
@@ -49,56 +49,8 @@ namespace EmpleadosMVC.Controllers
             });
            
             var Empleados = from e in db.Empleados select e;
-
-            //Edad filter
-            if (!string.IsNullOrEmpty(BuscarEdad))
-            {
-                Empleados = Empleados.Where(e => e.Edad.Equals(BuscarEdad));
-            }
-
-            //Nombre filter
-            if (!string.IsNullOrEmpty(BuscarNombre))
-            {
-                Empleados = Empleados.Where(e => e.Nombre.Contains(BuscarNombre));
-            }
-
-            //Categoria filter
-            if (!string.IsNullOrEmpty(EmpleadoCategoria))
-            {
-                Empleados = Empleados.Where(e => e.Categoria == EmpleadoCategoria);
-            }
-
-            //Antiguedad filter
-            switch (MenorMayor)
-            {
-                case ESize.Default:
-                    break;
-                case ESize.Menor:
-                        Empleados = Empleados.Where(e => e.Antiguedad < antiguedad);
-                    break;
-                case ESize.Mayor:
-                        Empleados = Empleados.Where(e => e.Antiguedad > antiguedad);
-                    break;
-            }
-
-            //OrderBy
-            switch (OrderBy)
-            {
-                case ECol.Default:
-                    break;
-                case ECol.Nombre:
-                    Empleados = Empleados.OrderBy(e => e.Nombre);
-                    break;
-                case ECol.Antiguedad:
-                    Empleados = Empleados.OrderBy(e => e.Antiguedad);
-                    break;
-                case ECol.Edad:
-                    Empleados = Empleados.OrderBy(e => e.Edad);
-                    break;
-                case ECol.Categoria:
-                    Empleados = Empleados.OrderBy(e => e.Categoria);
-                    break;
-            }
+            Empleados = filtrar(Empleados, BuscarNombre, BuscarEdad, antiguedad, BuscarCategoria, MenorMayor, OrderBy);
+            
 
             return View(Empleados);
         }
@@ -140,25 +92,7 @@ namespace EmpleadosMVC.Controllers
             }
             return "Method({ })";
         }
-        private Empleado llenarCamposNull(Empleado empleado) 
-        {
-            var empleadoResult = db.Empleados.Where(e => e.ID.Equals(empleado.ID));
-
-            if (empleado.Nombre == null)            
-                empleado.Nombre = empleadoResult.First().Nombre;
-
-            if (empleado.Categoria == null)
-                empleado.Categoria = empleadoResult.First().Categoria;
-
-            if (empleado.Edad == 0)
-                empleado.Edad = empleadoResult.First().Edad;
-
-            if (empleado.Antiguedad == 0)
-                empleado.Antiguedad = empleadoResult.First().Antiguedad;
-
-            return empleado;
-
-        }
+        
         //API
         // GET:ENDPOINT Empleados/EditAPI/5
         //[ValidateAntiForgeryToken]
@@ -180,7 +114,6 @@ namespace EmpleadosMVC.Controllers
                 query.Categoria = empleado.Categoria;
 
                 db.SaveChanges();
-                
             } 
         }
 
@@ -205,7 +138,6 @@ namespace EmpleadosMVC.Controllers
 
             if (!validacionLogicaEdadAntiguedad(empleado.Edad, empleado.Antiguedad))
             {
-
                 return RedirectToAction("CreateError");
             }
 
@@ -310,6 +242,86 @@ namespace EmpleadosMVC.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private IQueryable<Empleado> filtrar(
+            IQueryable<Empleado> Empleados,
+            string BuscarNombre,
+            string BuscarEdad,
+            int BuscarAntiguedad,
+            string BuscarCategoria ,
+            ESize MenorMayor = 0,
+            ECol OrderBy = 0) 
+        {
+            //Edad filter
+            if (!string.IsNullOrEmpty(BuscarEdad))
+            {
+                Empleados = Empleados.Where(e => e.Edad.Equals(BuscarEdad));
+            }
+
+            //Nombre filter
+            if (!string.IsNullOrEmpty(BuscarNombre))
+            {
+                Empleados = Empleados.Where(e => e.Nombre.Contains(BuscarNombre));
+            }
+
+            //Categoria filter
+            if (!string.IsNullOrEmpty(BuscarCategoria))
+            {
+                Empleados = Empleados.Where(e => e.Categoria == BuscarCategoria);
+            }
+
+            //Antiguedad filter
+            switch (MenorMayor)
+            {
+                case ESize.Default:
+                    break;
+                case ESize.Menor:
+                    Empleados = Empleados.Where(e => e.Antiguedad < BuscarAntiguedad);
+                    break;
+                case ESize.Mayor:
+                    Empleados = Empleados.Where(e => e.Antiguedad > BuscarAntiguedad);
+                    break;
+            }
+
+            //OrderBy
+            switch (OrderBy)
+            {
+                case ECol.Default:
+                    break;
+                case ECol.Nombre:
+                    Empleados = Empleados.OrderBy(e => e.Nombre);
+                    break;
+                case ECol.Antiguedad:
+                    Empleados = Empleados.OrderBy(e => e.Antiguedad);
+                    break;
+                case ECol.Edad:
+                    Empleados = Empleados.OrderBy(e => e.Edad);
+                    break;
+                case ECol.Categoria:
+                    Empleados = Empleados.OrderBy(e => e.Categoria);
+                    break;
+            }
+            return Empleados;
+        }
+
+        private Empleado llenarCamposNull(Empleado empleado)
+        {
+            var empleadoResult = db.Empleados.Where(e => e.ID.Equals(empleado.ID));
+
+            if (empleado.Nombre == null)
+                empleado.Nombre = empleadoResult.First().Nombre;
+
+            if (empleado.Categoria == null)
+                empleado.Categoria = empleadoResult.First().Categoria;
+
+            if (empleado.Edad == 0)
+                empleado.Edad = empleadoResult.First().Edad;
+
+            if (empleado.Antiguedad == 0)
+                empleado.Antiguedad = empleadoResult.First().Antiguedad;
+
+            return empleado;
         }
 
         //

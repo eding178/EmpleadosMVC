@@ -174,6 +174,18 @@ namespace EmpleadosMVC.Controllers
 
             return RedirectToAction("Index");
         }
+        // POST: Empleados/Create
+        // Para protegerse de ataques de publicación excesiva, habilite las propiedades específicas a las que desea enlazarse. Para obtener 
+        // más información vea http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpGet]
+        public ActionResult CreateRandom()
+        {
+            var empleadoRnd = new Empleado().EmpleadoRnd(db);
+            db.Empleados.Add(empleadoRnd);
+            db.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
 
         // GET: Empleados/Edit/5
         public ActionResult Edit(int? id)

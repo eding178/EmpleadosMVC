@@ -18,23 +18,31 @@ namespace EmpleadosMVC.Controllers
 
         // GET: Empleados
         public ActionResult Index(
+            
             string BuscarCategoria, 
             string BuscarNombre,
             string BuscarAntiguedad, 
             string BuscarEdad,
+            int page = 0,
             ESize MenorMayor = 0,
-            ECol OrderBy =0)
+            ECol OrderBy = 0
+            )
         {
+
             var antiguedad=0;
             try 
             {
                 antiguedad = Convert.ToInt32(BuscarAntiguedad);
             }
             catch { }
-
             var ListaCategoria = new List<string>();
+
             var ConsultaCategoria = from e in db.Empleados orderby e.Categoria select e.Categoria;
             ListaCategoria.AddRange(ConsultaCategoria.Distinct());
+
+            ViewBag.NextPage = (page + 1).ToString();
+            ViewBag.PrevPage = (page - 1).ToString();
+            ViewBag.page = (page).ToString();
 
             ViewBag.EmpleadoCategoria = new SelectList(ListaCategoria);
             ViewBag.MenorMayor = new SelectList(new List<string> { ESize.Menor.ToString(), ESize.Mayor.ToString() });
@@ -47,8 +55,7 @@ namespace EmpleadosMVC.Controllers
             });
            
             var Empleados = from e in db.Empleados select e;
-            Empleados = filtrar(Empleados, BuscarNombre, BuscarEdad, antiguedad, BuscarCategoria, MenorMayor, OrderBy);
-
+            Empleados = filtrarPaginar(Empleados, BuscarNombre, BuscarEdad, antiguedad, BuscarCategoria, page, MenorMayor, OrderBy);
             return View(Empleados);
         }
 
@@ -255,15 +262,21 @@ namespace EmpleadosMVC.Controllers
             base.Dispose(disposing);
         }
 
-        private IQueryable<Empleado> filtrar(
+        private IQueryable<Empleado> filtrarPaginar(
             IQueryable<Empleado> Empleados,
             string BuscarNombre,
             string BuscarEdad,
             int BuscarAntiguedad,
             string BuscarCategoria ,
+            int page,
             ESize MenorMayor = 0,
-            ECol OrderBy = 0) 
+            ECol OrderBy = 0
+            ) 
         {
+
+            int pgTake = 10;
+            int pgSkip = page * pgTake;
+
             //Edad filter
             if (!string.IsNullOrEmpty(BuscarEdad))
             {
@@ -299,18 +312,19 @@ namespace EmpleadosMVC.Controllers
             switch (OrderBy)
             {
                 case ECol.Default:
+                    Empleados = Empleados.OrderBy(e => e.Nombre).Skip(pgSkip).Take(pgTake);
                     break;
                 case ECol.Nombre:
-                    Empleados = Empleados.OrderBy(e => e.Nombre);
+                    Empleados = Empleados.OrderBy(e => e.Nombre).Skip(pgSkip).Take(pgTake);
                     break;
                 case ECol.Antiguedad:
-                    Empleados = Empleados.OrderBy(e => e.Antiguedad);
+                    Empleados = Empleados.OrderBy(e => e.Antiguedad).Skip(pgSkip).Take(pgTake);
                     break;
                 case ECol.Edad:
-                    Empleados = Empleados.OrderBy(e => e.Edad);
+                    Empleados = Empleados.OrderBy(e => e.Edad).Skip(pgSkip).Take(pgTake);
                     break;
                 case ECol.Categoria:
-                    Empleados = Empleados.OrderBy(e => e.Categoria);
+                    Empleados = Empleados.OrderBy(e => e.Categoria).Skip(pgSkip).Take(pgTake);
                     break;
             }
             return Empleados;

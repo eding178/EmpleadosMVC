@@ -11,41 +11,41 @@
 
     @using (Html.BeginForm("Index", "Empleados", FormMethod.Get))
     {
-<p>
-    <table class="table">
-        <tr>
-            <th>
-                Nombre: @Html.TextBox("BuscarNombre")
-            </th>
-            <th>
-                Categoria:@Html.DropDownList("EmpleadoCategoria", "Todas")
-            </th>
-            <th>
-                Antiguedad:@Html.DropDownList("MenorMayor","") @Html.TextBox("BuscarAntiguedad")
-            </th>
-            <th>
-                Edad:@Html.TextBox("BuscarEdad")
-            </th>
-            <th>
-                <input  class="btn btn-default alert-info" type="submit" value="Buscar" />
-            </th>
-        </tr>
+    <p>
+        <table class="table">
+            <tr>
+                <th>
+                    Nombre: @Html.TextBox("BuscarNombre")
+                </th>
+                <th>
+                    Categoria:@Html.DropDownList("EmpleadoCategoria", "Todas")
+                </th>
+                <th>
+                    Antiguedad:@Html.DropDownList("MenorMayor", "") @Html.TextBox("BuscarAntiguedad")
+                </th>
+                <th>
+                    Edad:@Html.TextBox("BuscarEdad")
+                </th>
+                <th>
+                    <input class="btn btn-default alert-info" type="submit" value="Buscar" />
+                </th>
+            </tr>
 
-        <tr>
-            <th id="orderBy">
-                OrderBy:@Html.DropDownList("OrderBy", "")
-            </th>
-        </tr>
-     </table>
-</p>
+            <tr>
+                <th id="orderBy">
+                    OrderBy:@Html.DropDownList("OrderBy", "")
+                </th>
+            </tr>
+        </table>
+    </p>
 }
 
 
 
 
-<p>
-    @Html.ActionLink("Create New ", "Create") | @Html.ActionLink(" Create New Random", "CreateRandom")
-</p>
+    <p>
+        @Html.ActionLink("Create New ", "Create") | @Html.ActionLink(" Create New Random", "CreateRandom")
+    </p>
     <table class="table">
         <tr>
             <th>
@@ -86,3 +86,11 @@
             </tr>
         }
     </table>
+    
+<p>
+    @if (ViewBag.page != "0") {
+        @Html.ActionLink((string)@ViewBag.PrevPage, "index", new { page = ViewBag.PrevPage }, new { @class = "btn btn-default" })
+    } 
+    @Html.ActionLink((string)@ViewBag.page, "index", new { page = ViewBag.page }, new { @class = "btn btn-default btn-info" })
+    @Html.ActionLink((string)@ViewBag.NextPage, "index", new { page = ViewBag.NextPage }, new { @class = "btn btn-default" }) 
+</p>

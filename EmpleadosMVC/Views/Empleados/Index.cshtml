@@ -87,10 +87,13 @@
         }
     </table>
     
-<p>
-    @if (ViewBag.page != "0") {
-        @Html.ActionLink((string)@ViewBag.PrevPage, "index", new { page = ViewBag.PrevPage }, new { @class = "btn btn-default" })
-    } 
-    @Html.ActionLink((string)@ViewBag.page, "index", new { page = ViewBag.page }, new { @class = "btn btn-default btn-info" })
-    @Html.ActionLink((string)@ViewBag.NextPage, "index", new { page = ViewBag.NextPage }, new { @class = "btn btn-default" }) 
-</p>
+    <p>
+        @if (ViewBag.page != "0")
+        {
+            @Html.ActionLink((string)@ViewBag.PrevPage, "index", new { page = ViewBag.PrevPage }, new { @class = "btn btn-default" })
+        }
+        @Html.ActionLink((string)@ViewBag.page, "index", new { page = ViewBag.page }, new { @class = "btn btn-default btn-info" })
+        @if (ViewBag.NextPageBool) { 
+            @Html.ActionLink((string)@ViewBag.NextPage, "index", new { page = ViewBag.NextPage }, new { @class = "btn btn-default" })
+        }
+    </p>

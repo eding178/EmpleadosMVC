@@ -28,7 +28,7 @@ namespace EmpleadosMVC.Controllers
             ECol OrderBy = 0
             )
         {
-
+            int pageSize = 10;
             var antiguedad=0;
             try 
             {
@@ -43,6 +43,7 @@ namespace EmpleadosMVC.Controllers
             ViewBag.NextPage = (page + 1).ToString();
             ViewBag.PrevPage = (page - 1).ToString();
             ViewBag.page = (page).ToString();
+            ViewBag.NextPageBool = true;
 
             ViewBag.EmpleadoCategoria = new SelectList(ListaCategoria);
             ViewBag.MenorMayor = new SelectList(new List<string> { ESize.Menor.ToString(), ESize.Mayor.ToString() });
@@ -54,9 +55,13 @@ namespace EmpleadosMVC.Controllers
                 ECol.Categoria.ToString()
             });
            
-            var Empleados = from e in db.Empleados select e;
-            Empleados = filtrarPaginar(Empleados, BuscarNombre, BuscarEdad, antiguedad, BuscarCategoria, page, MenorMayor, OrderBy);
-            return View(Empleados);
+            var empleadosTots = from e in db.Empleados select e;
+
+            var empleadosFiltrats = filtrarPaginar(empleadosTots, BuscarNombre, BuscarEdad, antiguedad, BuscarCategoria, page, pageSize, MenorMayor, OrderBy);
+
+            if (empleadosFiltrats.Count() + ((page)* pageSize) >= empleadosTots.Count())
+                ViewBag.NextPageBool = false;
+            return View(empleadosFiltrats);
         }
 
         // GET: Empleados/Details/5
@@ -269,13 +274,12 @@ namespace EmpleadosMVC.Controllers
             int BuscarAntiguedad,
             string BuscarCategoria ,
             int page,
+            int pageSize,
             ESize MenorMayor = 0,
             ECol OrderBy = 0
             ) 
         {
-
-            int pgTake = 10;
-            int pgSkip = page * pgTake;
+            int pgSkip = page * pageSize;
 
             //Edad filter
             if (!string.IsNullOrEmpty(BuscarEdad))
@@ -312,19 +316,19 @@ namespace EmpleadosMVC.Controllers
             switch (OrderBy)
             {
                 case ECol.Default:
-                    Empleados = Empleados.OrderBy(e => e.Nombre).Skip(pgSkip).Take(pgTake);
+                    Empleados = Empleados.OrderBy(e => e.Nombre).Skip(pgSkip).Take(pageSize);
                     break;
                 case ECol.Nombre:
-                    Empleados = Empleados.OrderBy(e => e.Nombre).Skip(pgSkip).Take(pgTake);
+                    Empleados = Empleados.OrderBy(e => e.Nombre).Skip(pgSkip).Take(pageSize);
                     break;
                 case ECol.Antiguedad:
-                    Empleados = Empleados.OrderBy(e => e.Antiguedad).Skip(pgSkip).Take(pgTake);
+                    Empleados = Empleados.OrderBy(e => e.Antiguedad).Skip(pgSkip).Take(pageSize);
                     break;
                 case ECol.Edad:
-                    Empleados = Empleados.OrderBy(e => e.Edad).Skip(pgSkip).Take(pgTake);
+                    Empleados = Empleados.OrderBy(e => e.Edad).Skip(pgSkip).Take(pageSize);
                     break;
                 case ECol.Categoria:
-                    Empleados = Empleados.OrderBy(e => e.Categoria).Skip(pgSkip).Take(pgTake);
+                    Empleados = Empleados.OrderBy(e => e.Categoria).Skip(pgSkip).Take(pageSize);
                     break;
             }
             return Empleados;

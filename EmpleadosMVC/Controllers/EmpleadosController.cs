@@ -101,7 +101,18 @@ namespace EmpleadosMVC.Controllers
             }
             return "Method({ })";
         }
-        
+
+        //API
+        // GET:ENDPOINT Empleados/DetailsAPI/5
+        [EnableCors("origins: *, headers: *, methods: *")]
+        public string DeleteAPI(int? id)
+        {
+            Empleado empleado = db.Empleados.Find(id);
+            db.Empleados.Remove(empleado);
+            db.SaveChanges();
+            return "Method({ })";
+        }
+
         //API
         // GET:ENDPOINT Empleados/EditAPI/5
         //[ValidateAntiForgeryToken]
